@@ -102,6 +102,14 @@ python stream_video_client.py --host 192.168.1.3 --receive_controls
 
 Enjoy driving!
 
+## Training data 
+
+The training data and training itself can be done using the code in the wonderful donkeycar project, see www.donkeycar.com
+Basically, all necessary data are images (by default of 160x120 pix) associated with driving data, saved as json files with the information of the steering and throttle at that particular time.
+As an example a video with an extract of the data is shown in images/training_data_sample.mp4 
+
+![rc-pi-car training](./images/training_data_sample.mp4)
+
 ## Test 
 
 1. Testing the video reception from localhost 
