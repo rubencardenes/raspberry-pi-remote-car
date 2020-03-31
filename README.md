@@ -71,7 +71,7 @@ Enable Camera
 
 # Running the car 
 
-I Suppose, the IP of your PC is 192.168.1.3
+Let's assume that the IP of your PC is 192.168.1.3 
 
 The scripts have to be run first on the PC and then on the PI:
 
@@ -84,7 +84,7 @@ cd YOR_PROJECTS_FOLDER/raspberry-pi-remote-car
 source venv/bin/activate 
 python run_server.py --mode manual 
 ```
-In this case, I suppose you have a PS4 controller connected via USB to the PC 
+In this case, you have to have a PS4 controller connected via USB to the PC 
 
 2. In the Raspberry PI:
 
@@ -107,7 +107,7 @@ python run_server.py --mode autopilot
 
 ```
 cd  YOR_PROJECTS_FOLDER/raspberry-pi-remote-car 
-python stream_video_client.py --host 192.168.1.3 --receive_controls
+python run_client.py --host 192.168.1.3 --receive_controls
 ```
 
 Enjoy driving!
@@ -120,7 +120,7 @@ As an example a video with an extract of the data is shown in images/training_da
 
 ![rc-pi-car training](./images/training_data_sample.mp4)
 
-## Test 
+## Testing the code 
 
 1. Testing the video reception from localhost 
 In a terminal in the PC: 
@@ -128,15 +128,29 @@ In a terminal in the PC:
 cd  YOR_PROJECTS_FOLDER/raspberry-pi-remote-car
 python run_server.py --mode video-only
 ```
-in another terminal also in the PC: 
+Wait a couple of seconds to allow the server to start, and in another terminal also in the PC: 
 ```
 cd tests 
 python run_client_test.py 
 ```
-
 You should see a window with the video streaming 
 
-2. Test keras model 
+2. Testing the video and PS4 command controls from localhost 
+n a terminal in the PC: 
+```
+cd  YOR_PROJECTS_FOLDER/raspberry-pi-remote-car
+python run_server.py --mode manual
+```
+Again you nned to connect the PS4 controller, and in another terminal also in the PC: 
+```
+cd tests 
+python run_client_test.py --receive_controls
+```
+You should see a window with the video streaming and by moving the controller you should see in the terminals the steering and throttle values
+
+You can also test the keras model on the PC the same way by changing *manual* by *autopilot*
+
+3. Test keras model 
 In the PC: 
 ```
 cd test
@@ -154,7 +168,6 @@ GT: steer 0.000 throttle 0.456
 
 * Left stick: Forward/backwards movement (rear motor)     
 * Right stick: Left/right steering (front motor)
-* R1: activate deactivate incoming control messages to the terminal 
 
 The more you press forward/backwards on the stick, the more acceleration is provided. Same happens for left/right steering
 This feature is provided by the ENA_PWM and ENB_PWM ChangeDutyCycle(value) method (lines 122, 123). The value given controls the power provided to the motors.    
@@ -198,6 +211,8 @@ I had some issues with the power supply. The Raspberry PI needs 5 V power supply
 That was not very practical for several reasons (costs, weight, capacity balance, battery change). Therefore, I changed that to a 2S 7.4 V Lipo battery with 4000 mA/h capacity. 
 To save battery life, when I was testing the setup, I simply connected the PI using a micro USB power cable, which can be combined with the batteries with no problem. 
 
+For some reason, on MacOS the threaded version doesn't work for me. As threading is not strictly necessary, I used run_server_nothread.py instead.  
+
 ## Credits
 
 - Donkey Car project https://www.donkeycar.com/
@@ -205,8 +220,6 @@ To save battery life, when I was testing the setup, I simply connected the PI us
 - Elektronx http://www.elektronx.de/motoren-mit-ps4-controller-steuern/ for the control callbacks
 - Youtube sentdex channel for great explanation on sockets: https://www.youtube.com/watch?v=Lbfe3-v7yE0&t=238s
 - The hardware part is mostly described in this great series of youtube videos by Daniel Murray: https://www.youtube.com/watch?v=icpZU_Pufno (The software part from that series differs greatly froom this software) 
-
-
 
 
 
