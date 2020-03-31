@@ -7,9 +7,6 @@ Prototype car, right:
 Prototype car, front:  
 <img src="./images/rc-pi-car-prototype_02.jpeg" alt="rc-pi-car-prototype2" width="300"/>
 
-Camera view:  
-<img src="./images/42_test_image_car.jpg" alt="rc-pi-car-from_camera" width="300"/>
-
 # Description:
 
 This code is to control remotely a Raspberry PI car with L298N HBridge motor controller, and simultaneosly receive video signal. 
@@ -120,6 +117,9 @@ As an example a video with an extract of the data is shown in images/training_da
 
 ![rc-pi-car training](./images/training_data_sample.mp4)
 
+Example training data image:  
+<img src="./images/42_test_image_car.jpg" alt="rc-pi-car-from_camera" width="300"/>
+
 ## Testing the code 
 
 1. Testing the video reception from localhost 
@@ -141,7 +141,7 @@ n a terminal in the PC:
 cd  YOR_PROJECTS_FOLDER/raspberry-pi-remote-car
 python run_server.py --mode manual
 ```
-Again you nned to connect the PS4 controller, and in another terminal also in the PC: 
+Again you need to connect the PS4 controller, and in another terminal also in the PC: 
 ```
 cd tests 
 python run_client_test.py --receive_controls
@@ -205,7 +205,7 @@ My initial idea was to use the integrated bluetooth on the PI to control the car
 - Second: connection of the controller with bluetooth is a bit cumbersome and you have to start it manually every time on both sides, plus I found it not very stable. 
 - Third: the range of bluetooth is not going to be as good as that provided by wifi.
 
-Therefore, my solution here is to simply connect the PS4 controller to my computer using a USB cable, and send the PS4 controller signal from my computer to the PI, while at the same time receive video to my computer in the web browser. All is done by wifi and delay is negligible. It allows me to sit with my PC and run the car whenever I have wifi coverage (if the car does#t get stuck in any place). It works just great. 
+Therefore, my solution here is to simply connect the PS4 controller to my computer using a USB cable, and send the PS4 controller signal from my computer to the PI, while at the same time receive video to my computer in the web browser. All is done by wifi and delay is negligible. It allows me to sit with my PC and run the car whenever I have wifi coverage (if the car doesn't get stuck in any place). It works just great. 
 
 I had some issues with the power supply. The Raspberry PI needs 5 V power supply than can be provided by the L298N H-bridge. However, I notice that if I use a set of 6 cheap AAA batteries, it wasn't enough to power the PI, so I added three more. 
 That was not very practical for several reasons (costs, weight, capacity balance, battery change). Therefore, I changed that to a 2S 7.4 V Lipo battery with 4000 mA/h capacity. 
