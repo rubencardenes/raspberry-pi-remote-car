@@ -45,7 +45,7 @@ class PS4Controller(object):
     def convert_dict_into_steer_throttle(self, event_dict):
         if sys.platform == 'linux':
             steering = event_dict['axis'][3]
-            throttle = event_dict['axis'][1]
+            throttle = -1*event_dict['axis'][1]
         else:
             steering = event_dict['axis'][2]
             throttle = event_dict['axis'][1]

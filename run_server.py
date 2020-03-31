@@ -55,6 +55,7 @@ class VideoClientThread(Thread):
 
     def run(self):
         stream_bytes = b' '
+        cv2.namedWindow("video feed", cv2.WINDOW_KEEPRATIO)
 
         # stream video frames one by one
         try:
@@ -71,7 +72,7 @@ class VideoClientThread(Thread):
                     stream_bytes = stream_bytes[last + 2:]
                     image = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
                     frame_num += 1
-                    cv2.imshow('image', image)
+                    cv2.imshow("video feed", image)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
                     if self.model is not None:
