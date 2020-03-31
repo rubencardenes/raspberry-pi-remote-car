@@ -20,7 +20,7 @@ class PS4Controller(object):
     button_data = None
     hat_data = None
 
-    def __init__(self):
+    def __init__(self, verbose=False):
         """Initialize the joystick components"""
 
         pygame.init()
@@ -29,8 +29,8 @@ class PS4Controller(object):
         self.controller.init()
         self.event_dict = {}
         self.axis_data = {i: 0 for i in range(7)}
-        self.verbose = True
-
+        self.verbose = verbose
+        self.steering, self.throttle = 0, 0
         if not self.axis_data:
             self.axis_data = {}
 
@@ -44,13 +44,22 @@ class PS4Controller(object):
             for i in range(self.controller.get_numhats()):
                 self.hat_data[i] = (0, 0)
 
+    def convert_dict_into_steer_throttle(self, event_dict):
+        if sys.platform == 'linux':
+            steering = event_dict['axis'][3]
+            throttle = event_dict['axis'][1]
+        else:
+            steering = event_dict['axis'][2]
+            throttle = event_dict['axis'][1]
+        return steering, throttle
+
     def generate_event(self):
         """Listen for events to happen and send commands"""
         print("Generating event")
         hadEvent = False
 
         while True:
-            #print("In event loop ")
+
             for event in pygame.event.get():
                 if event.type == pygame.JOYAXISMOTION:
                     self.axis_data[event.axis] = round(event.value, 2)
@@ -69,20 +78,6 @@ class PS4Controller(object):
                     hadEvent = True
 
                 if hadEvent:
-
-                    # If platform is linux we need to change some values in axis_data
-                    #os.system('clear')
-                    #print("Axis before")
-                    pprint.pprint(self.axis_data)
-                    if sys.platform == 'linux':
-                        # self.axis_data[2], self.axis_data[3], self.axis_data[4] = self.axis_data[4], self.axis_data[2], self.axis_data[3]
-                        temp2 = self.axis_data[2]
-                        temp3 = self.axis_data[3]
-                        temp4 = self.axis_data[4]
-                        self.axis_data[2] = temp4
-                        self.axis_data[3] = temp2
-                        self.axis_data[4] = temp3
-
                     self.event_dict['axis'] = self.axis_data
                     self.event_dict['button'] = self.button_data
 
@@ -96,10 +91,11 @@ class PS4Controller(object):
                         pprint.pprint(self.axis_data)
                         # print("Motion ")
                         # pprint.pprint(self.hat_data)
-                else:
-                    self.event_dict = {}
 
-                yield self.event_dict
+                    self.steering, self.throttle = self.convert_dict_into_steer_throttle(self.event_dict)
+
+            print("Generating ", self.steering, self.throttle)
+            yield [self.steering, self.throttle]
 
 
 class PS4ClientThread(Thread):
@@ -112,7 +108,6 @@ class PS4ClientThread(Thread):
         print("[+] New server socket thread started for " + ip + ":" + str(port))
 
     def run(self):
-        HEADERSIZE = 10
 
         # stream video frames one by one
         try:
@@ -120,14 +115,11 @@ class PS4ClientThread(Thread):
             self.events = ps4_events.generate_event()
             print("PS4 thread started")
             while True:
-                event_dict = next(self.events)
+                steering, throttle = next(self.events)
                 # Test event_dict
                 # event_dict = {'frame': frame_num}
-                message = pickle.dumps(event_dict, protocol=2)
-                message = bytes(f"{len(message):<{HEADERSIZE}}", 'utf-8') + message
-                # print("Sending data ")
-                time.sleep(0.03)
-                self.connection.sendall(message)
+                message = f'{steering}, {throttle}'
+                self.connection.send(message.encode())
 
         finally:
             print("Connection closed on thread 2")
@@ -188,7 +180,7 @@ class PS4ControllerSender(Thread):
                 values = [x for x in self.axis_data.values()]
 
                 #if hadEvent:
-                if sum(values) > 0.01:
+                if abs(sum(values)) > 0.01:
                     # If platform is linux we need to change some values in axis_data
                     #os.system('clear')
                     #print("Axis before")
@@ -207,11 +199,11 @@ class PS4ControllerSender(Thread):
 
                     # if self.button_data[4]:
                     #    self.verbose = not self.verbose
-                    message = pickle.dumps(self.event_dict, protocol=2)
+                    message = pickle.dumps(self.event_dict, protocol=4)
                     message = bytes(f"{len(message):<{self.HEADERSIZE}}", 'utf-8') + message
                     # print("Sending data ")
                     time.sleep(0.03)
-                    # self.connection.sendall(message)
+                    self.connection.sendall(message)
 
                     if self.verbose:
                         # print("Button ")

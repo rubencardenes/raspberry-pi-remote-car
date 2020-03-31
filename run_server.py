@@ -20,20 +20,27 @@ import numpy as np
 from threading import Thread
 import socket
 from argparse import ArgumentParser
-from PS4ControllerServer import PS4ControllerSender
+from PS4Controller import PS4Controller
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 from keras_pilot import KerasCategorical
 
 
 class VideoClientThread(Thread):
     """Class to Receive video data from client"""
 
-    def __init__(self, ip, port, connection, model_path=''):
+    def __init__(self, ip, port, connection, model_path='', send_ps4=False):
         from keras_pilot import KerasLinear
         Thread.__init__(self)
         self.ip = ip
         self.port = port
         self.connection = connection
         self.model = None
+        self.ps4 = None
+        if send_ps4:
+            self.ps4 = PS4Controller()
+            self.ps4_events = self.ps4.generate_event()
+
 
         if model_path != '':
             IMAGE_W = 160
@@ -51,7 +58,6 @@ class VideoClientThread(Thread):
 
         # stream video frames one by one
         try:
-
             print("Video thread started")
             frame_num = 0
             i = 0
@@ -65,17 +71,21 @@ class VideoClientThread(Thread):
                     stream_bytes = stream_bytes[last + 2:]
                     image = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
                     frame_num += 1
+                    cv2.imshow('image', image)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
                     if self.model is not None:
                         print(f"im shape {image.shape} {image.dtype}")
                         steering, throttle = self.model.run(image)
                         print(f"steering {steering} throtle {throttle}")
                         message = f'{steering}, {throttle}'
                         self.connection.send(message.encode())
-
-                    cv2.imshow('image', image)
-
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                    if self.ps4 is not None:
+                        os.system('clear')
+                        steering, throttle = next(self.ps4_events)
+                        print(f"steering {steering} throttle {throttle}")
+                        message = f'{steering}, {throttle}'
+                        self.connection.send(message.encode())
 
             cv2.destroyAllWindows()
 
@@ -98,22 +108,9 @@ def start_multihreaded_server(server_host, port, model_path="", PS4_server=False
     tcpServer.listen(4)
     print("Python server : Waiting for Video connection from TCP clients...")
     (conn, (ip, port)) = tcpServer.accept()
-    newthread = VideoClientThread(ip, port, conn, model_path=model_path)
+    newthread = VideoClientThread(ip, port, conn, model_path=model_path, send_ps4=PS4_server)
     newthread.start()
     threads.append(newthread)
-
-    # PS4 sending server
-    if PS4_server:
-        tcpServer.listen(4)
-        print("Python server : Waiting for PS4 connection from TCP clients...")
-        (conn, (ip, port)) = tcpServer.accept()
-        # Option 1
-        # newthread = PS4ClientThread(ip, port, conn)
-
-        # Option 2
-        newthread = PS4ControllerSender(ip, port, conn)
-        newthread.start()
-        threads.append(newthread)
 
     for t in threads:
         t.join()
@@ -144,7 +141,7 @@ if __name__ == '__main__':
     port = args['port']
 
     if args['mode'] == "autopilot":
-        model_path = '/home/ruben/mycar/models/pilot_home_day_cat_aug2.h5'
+        model_path = './models/pilot_home_day_cat_aug.h5'
         start_multihreaded_server(server_host, port, model_path=model_path, PS4_server=False)
     if args['mode'] == "manual":
         start_multihreaded_server(server_host, port, model_path="", PS4_server=True)

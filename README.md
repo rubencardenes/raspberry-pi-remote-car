@@ -1,10 +1,11 @@
 # raspberry-pi-remote-car
 Python code to control remotely a Raspberry PI car using a keras deep learning model using video received from a camera located in the car. Additionally, the code can control the car manually with a PS4 controller 
 
+Prototype car, right:  
 <img src="./images/rc-pi-car-prototype_01.jpeg" alt="rc-pi-car-prototype1" width="300"/>
-Prototype car, right  
+
+Prototype car, front:  
 <img src="./images/rc-pi-car-prototype_02.jpeg" alt="rc-pi-car-prototype2" width="300"/>
-Prototype car, front  
 
 # Description:
 

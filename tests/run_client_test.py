@@ -72,47 +72,6 @@ class VideoSendThread(Thread):
             self.connection.close()
             self.client_socket.close()
 
-class PS4ReceiveThread(Thread):
-    # A class to receive data from PS4 using threads
-    # This class inherits from Thread, which means that will run on a separate Thread
-    # whenever called, it starts the run method
-
-    def __init__(self, host, port):
-        Thread.__init__(self)
-        # create socket and bind host
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((host, port))
-        self.HEADERSIZE = 10
-
-    def run(self):
-        try:
-            new_msg = True
-            full_msg = b''
-            while True:
-                ### Receiving Data
-                data = self.client_socket.recv(512)
-                if new_msg:
-                    try:
-                        msglen = int(data[:self.HEADERSIZE])
-                        new_msg = False
-                    except:
-                        new_msg = True
-                        continue
-
-                full_msg += data
-                if len(full_msg) - self.HEADERSIZE >= msglen:
-                    # print("full msg recvd")
-                    event = pickle.loads(full_msg[self.HEADERSIZE:])
-                    # We set the new_msg flag to True
-                    new_msg = True
-                    # and reset the full message empty
-                    full_msg = b''
-
-                    print("Received event: ", event)
-
-        finally:
-            self.client_socket.close()
-
 if __name__ == "__main__":
 
     parser = ArgumentParser()
@@ -145,12 +104,6 @@ if __name__ == "__main__":
     newthread = VideoSendThread(host, port, receive_controls=args['receive_controls'])
     newthread.start()
     threads.append(newthread)
-
-    PS4_command_reception = False
-    if PS4_command_reception:
-        newthread = PS4ReceiveThread(host, port)
-        newthread.start()
-        threads.append(newthread)
 
     for t in threads:
         t.join()
