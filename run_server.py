@@ -107,7 +107,7 @@ def start_multihreaded_server(server_host, port, model_path="", PS4_server=False
 
     # Video connection
     tcpServer.listen(4)
-    print("Python server : Waiting for Video connection from TCP clients...")
+    print(f"Python server: on {server_host}:{port} Waiting for Video connection from TCP clients...")
     (conn, (ip, port)) = tcpServer.accept()
     newthread = VideoClientThread(ip, port, conn, model_path=model_path, send_ps4=PS4_server)
     newthread.start()

@@ -21,13 +21,17 @@ No bluetooh is used.
 
 # Features
 
-- Remote control using PS4 Dualshock controller 
-- Wifi video streaming using http server 
-- Acceleration control using PS4 
-- Control test script on localhost
-- Test script to 
-- Test script for the keras model   
-
+- [x] Manual car control from local PC using PS4 Dualshock controller (manual mode) 
+- [x] Automatic car control from local PC using keras model (autopilot mode)  
+- [x] Wifi video streaming direct from python script  
+- [x] Multi-threading support  
+- [x] Linux support
+- [x] Windows support
+- [ ] MacOS support 
+- [x] Test scripts on localhost
+- [x] Test script for the keras model   
+- [ ] Keras model training support 
+ 
 # Installation on the PC  
 
 1. Download the code in your pc:

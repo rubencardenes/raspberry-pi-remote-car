@@ -45,7 +45,7 @@ class VideoSendThread(Thread):
                 # send jpeg format video stream
                 # encode the frame in JPEG format
                 ret, frame = cap.read()
-                frame = cv2.resize(frame, (self.IMAGE_W, self.IMAGE_H))
+                frame = cv2.resize(frame, (self.IMAGE_W, self.IMAGE_H), cv2.INTER_AREA)
                 (flag, encodedImage) = cv2.imencode(".jpg", frame)
                 # ensure the frame was successfully encoded
                 if not flag:
