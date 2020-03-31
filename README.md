@@ -7,6 +7,9 @@ Prototype car, right:
 Prototype car, front:  
 <img src="./images/rc-pi-car-prototype_02.jpeg" alt="rc-pi-car-prototype2" width="300"/>
 
+Camera view:  
+<img src="./images/42_test_image_car.jpg" alt="rc-pi-car-from_camera" width="300"/>
+
 # Description:
 
 This code is to control remotely a Raspberry PI car with L298N HBridge motor controller, and simultaneosly receive video signal. 
@@ -27,7 +30,7 @@ No bluetooh is used.
 - [x] Multi-threading support  
 - [x] Linux support
 - [x] Windows support
-- [ ] MacOS support 
+- [x] MacOS support (use nonthread version) 
 - [x] Test scripts on localhost
 - [x] Test script for the keras model   
 - [ ] Keras model training support 

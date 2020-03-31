@@ -1,7 +1,7 @@
 # ###################################################################
 # Ruben Cardenes -- Mar 2020
 #
-# File:        stream_video_client_test.py
+# File:        run_client_test.py
 # Description: This script is used for testing the client-server setup on the PC
 #              It opens a connection in localhost and sends video streaming
 #              from the USB camera

@@ -1,7 +1,7 @@
 # ###################################################################
 # Ruben Cardenes -- Mar 2020
 #
-# File:        stream_video_client.py
+# File:        run_client.py
 # Description: This scripts starts a client in the Raspberry pi that connects
 #              to a server in another PC. Upon connection, this scripts sends
 #              a video stream from the PI camera encoded as JPEG

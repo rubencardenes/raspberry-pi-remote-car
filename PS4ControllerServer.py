@@ -2,7 +2,9 @@
 # Ruben Cardenes -- Mar 2020
 #
 # File:        PS4ControllerServer.py
-#
+# Description: This is an old file to do multi-threading socket server
+#              Turned out to be not necessary but I want to keep it for
+#              for my records. Please, disregard this file
 # ###################################################################
 
 from threading import Thread

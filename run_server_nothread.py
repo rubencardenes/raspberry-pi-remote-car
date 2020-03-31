@@ -1,7 +1,7 @@
 # ###################################################################
 # Ruben Cardenes -- Mar 2020
 #
-# File:        run_server.py
+# File:        stream_video_server.py
 # Description: This script starts a server that listen from incoming video streaming
 #              connection (for instance from a Raspberry Pi), shows the video and
 #              then depending on the mode it does:
@@ -17,7 +17,6 @@
 import cv2
 import os
 import numpy as np
-from threading import Thread
 import socket
 from argparse import ArgumentParser
 from PS4Controller import PS4Controller
@@ -25,11 +24,10 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
-class VideoClientThread(Thread):
+class VideoClient():
     """Class to Receive video data from client"""
 
     def __init__(self, ip, port, connection, model_path='', send_ps4=False):
-        Thread.__init__(self)
         self.ip = ip
         self.port = port
         self.connection = connection
@@ -95,7 +93,7 @@ class VideoClientThread(Thread):
             print("Connection closed on thread 1")
 
 
-def start_multihreaded_server(server_host, port, model_path="", PS4_server=False):
+def start_server(server_host, port, model_path="", PS4_server=False):
 
     TCP_IP = server_host
     TCP_PORT = port
@@ -103,18 +101,13 @@ def start_multihreaded_server(server_host, port, model_path="", PS4_server=False
     tcpServer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tcpServer.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     tcpServer.bind((TCP_IP, TCP_PORT))
-    threads = []
 
     # Video connection
     tcpServer.listen(4)
     print(f"Python server: on {server_host}:{port} Waiting for Video connection from TCP clients...")
     (conn, (ip, port)) = tcpServer.accept()
-    newthread = VideoClientThread(ip, port, conn, model_path=model_path, send_ps4=PS4_server)
-    newthread.start()
-    threads.append(newthread)
-
-    for t in threads:
-        t.join()
+    v = VideoClient(ip, port, conn, model_path=model_path, send_ps4=PS4_server)
+    v.run()
 
 
 if __name__ == '__main__':
@@ -143,8 +136,8 @@ if __name__ == '__main__':
 
     if args['mode'] == "autopilot":
         model_path = './models/pilot_home_day_cat_aug.h5'
-        start_multihreaded_server(server_host, port, model_path=model_path, PS4_server=False)
+        start_server(server_host, port, model_path=model_path, PS4_server=False)
     if args['mode'] == "manual":
-        start_multihreaded_server(server_host, port, model_path="", PS4_server=True)
+        start_server(server_host, port, model_path="", PS4_server=True)
     if args['mode'] == "video-only":
-        start_multihreaded_server(server_host, port, model_path="", PS4_server=False)
+        start_server(server_host, port, model_path="", PS4_server=False)
