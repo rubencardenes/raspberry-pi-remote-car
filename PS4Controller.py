@@ -48,7 +48,7 @@ class PS4Controller(object):
             throttle = -1*event_dict['axis'][1]
         else:
             steering = event_dict['axis'][2]
-            throttle = event_dict['axis'][1]
+            throttle = -1*event_dict['axis'][1]
         return steering, throttle
 
     def generate_event(self):
